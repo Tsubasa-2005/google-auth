@@ -1,36 +1,47 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Google Login Frontend with Next.js
 
-## Getting Started
+このプロジェクトは、Next.jsを使用して構築されたフロントエンドアプリケーションで、ユーザーがGoogleログインを通して認証する機能を備えています。このアプリケーションは、バックエンドと連携してGoogleトークンの取得と検証を行い、認証を完了させます。
 
-First, run the development server:
+## 機能
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- Googleログインによる認証
+- 認証トークンのバックエンド送信と検証
+- ログインしたユーザーのデータの取得
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 関連リポジトリ
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- [バックエンドリポジトリ](https://github.com/Tsubasa-2005/GoogleAuthAPI) - Google認証を処理するGoで構築されたバックエンドAPI。
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## セットアップ
 
-## Learn More
+1. **リポジトリをクローン**:
 
-To learn more about Next.js, take a look at the following resources:
+   ```
+   git clone https://github.com/Tsubasa-2005/google-auth.git
+   cd google-auth
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+2. **依存関係のインストール**:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+   ```
+   npm install
+   ```
 
-## Deploy on Vercel
+3. **環境変数の設定**:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+   プロジェクトルートに `.env.local` ファイルを作成し、以下の変数を設定します。
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+   ```
+   GOOGLE_CLIENT_ID=<Google OAuth2 クライアントID>
+    GOOGLE_CLIENT_SECRET=<Google OAuth2 クライアントシークレット>
+    NEXTAUTH_URL=http://localhost:3000
+    NEXTAUTH_SECRET=<NextAuthのシークレット>
+   ```
+
+4. **アプリケーションの実行**:
+
+   ```
+   npm run dev
+   ```
+
+   ローカルサーバーは `http://localhost:3000` で起動します。
