@@ -1,21 +1,20 @@
-// src/app/index.adapter.tsx
 "use client";
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import {UserTokenPayload} from "@/lib/utils/payload_type";
 
 interface AdapterProps {
     onSignIn: () => Promise<void>;
-    user: any | null;
+    user: UserTokenPayload | null;
 }
 
 export default function useSignInAdapter(): AdapterProps {
     const router = useRouter();
-    const [user, setUser] = useState<any | null>(null);
+    const [user, setUser] = useState<UserTokenPayload | null>(null);
 
     const handleSignIn = async () => {
         try {
-            // Step 1: Retrieve session data from `/api/get-session`
             const sessionResponse = await fetch("/api/get-session", {
                 method: "GET",
                 headers: { "Content-Type": "application/json" },
@@ -28,7 +27,6 @@ export default function useSignInAdapter(): AdapterProps {
 
             const sessionData = await sessionResponse.json();
 
-            // Step 2: Authenticate using the session's access token with `/api/auth/google`
             const authResponse = await fetch("/api/auth/google", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -40,13 +38,11 @@ export default function useSignInAdapter(): AdapterProps {
                 return;
             }
 
-            // Step 3: Fetch user data from `/api/session`
             const userResponse = await fetch("/api/session");
             if (userResponse.ok) {
                 const userData = await userResponse.json();
-                setUser(userData.user);
+                setUser(userData.user as UserTokenPayload);
 
-                // Step 4: Navigate to the dashboard if successful
                 router.push("/dashboard");
             } else {
                 console.error("Failed to retrieve user data from /api/session.");
