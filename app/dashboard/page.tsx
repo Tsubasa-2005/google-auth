@@ -1,25 +1,25 @@
-'use client';
+"use client";
 
 import { useEffect } from "react";
 import useSignInAdapter from "@/app/dashboard/page.adapter";
 
-
 export default function DashboardPage() {
-    const { onSignIn, user } = useSignInAdapter();
+    const { user, error, getUser } = useSignInAdapter();
 
     useEffect(() => {
         if (!user) {
-            onSignIn().then(r => r);
+            getUser().then(r => r);
         }
-    }, [user, onSignIn]);
+    }, [user, getUser]);
 
+    if (error) return <div>Error: {error}</div>;
     if (!user) return <div>Loading...</div>;
 
     return (
         <main>
             <h1>Welcome to the Dashboard</h1>
-            <p>Name: {user.id}</p>
-            <p>Email: {user.name}</p>
+            <p>Name: {user.name}</p>
+            <p>Email: {user.email}</p>
         </main>
     );
 }

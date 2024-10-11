@@ -1,17 +1,42 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import {UserTokenPayload} from "@/lib/utils/payload_type";
+import { useState, useCallback } from "react";
+import { UserTokenPayload } from "@/lib/utils/payload_type";
 
 interface AdapterProps {
     onSignIn: () => Promise<void>;
+    getUser: () => Promise<void>;
     user: UserTokenPayload | null;
+    error: string | null;
 }
 
 export default function useSignInAdapter(): AdapterProps {
     const router = useRouter();
     const [user, setUser] = useState<UserTokenPayload | null>(null);
+    const [error, setError] = useState<string | null>(null);
+
+    // Function to fetch user data from /api/getUser
+    const getUser = useCallback(async () => {
+        if (user) return; // Only execute if user is null
+
+        try {
+            const userResponse = await fetch("/api/session", {
+                method: "GET",
+                headers: { "Content-Type": "application/json" },
+            });
+
+            if (userResponse.ok) {
+                const userData = await userResponse.json();
+                setUser(userData.user as UserTokenPayload);
+                setError(null);
+            } else {
+                setError("Failed to retrieve user data from /api/getUser.");
+            }
+        } catch (error) {
+            setError(`Error fetching user data: ${error}`);
+        }
+    }, [user]);
 
     const handleSignIn = async () => {
         try {
@@ -21,7 +46,8 @@ export default function useSignInAdapter(): AdapterProps {
             });
 
             if (!sessionResponse.ok) {
-                console.error("Failed to retrieve session from /api/get-session.");
+                setError("Failed to retrieve session from /api/get-session.");
+                router.push("/signin");
                 return;
             }
 
@@ -33,24 +59,18 @@ export default function useSignInAdapter(): AdapterProps {
                 body: JSON.stringify({ session: sessionData.session }),
             });
 
-            if (!authResponse.ok) {
-                console.error("Authentication failed on /api/auth/google.");
-                return;
-            }
-
-            const userResponse = await fetch("/api/session");
-            if (userResponse.ok) {
-                const userData = await userResponse.json();
-                setUser(userData.user as UserTokenPayload);
-
+            if (authResponse.ok) {
+                setError(null);
                 router.push("/dashboard");
             } else {
-                console.error("Failed to retrieve user data from /api/session.");
+                setError("Authentication failed on /api/auth/google.");
+                router.push("/signin");
             }
         } catch (error) {
-            console.error("Error during sign-in process:", error);
+            setError(`Error during sign-in process: ${error}`);
+            router.push("/signin");
         }
     };
 
-    return { onSignIn: handleSignIn, user };
+    return { onSignIn: handleSignIn, getUser, user, error };
 }
