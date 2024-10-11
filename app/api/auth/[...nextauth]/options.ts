@@ -5,7 +5,7 @@ export const options: NextAuthOptions = {
     debug:true,
     session: {
         strategy: "jwt",
-        maxAge: 60 * 5,
+        maxAge: 60 * 2,
     },
     providers: [
         GoogleProvider({
