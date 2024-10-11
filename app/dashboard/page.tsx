@@ -1,4 +1,3 @@
-// src/app/dashboard/page.tsx
 'use client';
 
 import { useEffect } from "react";
@@ -10,7 +9,7 @@ export default function DashboardPage() {
 
     useEffect(() => {
         if (!user) {
-            onSignIn(); // Trigger the sign-in process to fetch user data
+            onSignIn().then(r => r);
         }
     }, [user, onSignIn]);
 
@@ -19,8 +18,8 @@ export default function DashboardPage() {
     return (
         <main>
             <h1>Welcome to the Dashboard</h1>
-            <p>Name: {user.name}</p>
-            <p>Email: {user.email}</p>
+            <p>Name: {user.id}</p>
+            <p>Email: {user.name}</p>
         </main>
     );
 }
