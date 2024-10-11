@@ -1,0 +1,145 @@
+openapi: 3.0.3
+info:
+  title: Google Login API
+  version: "1.0.0"
+  description: API to handle user registration and login using Google authentication
+  license:
+    name: MIT
+    url: https://github.com/Tsubasa-2005/GoogleAuthAPI
+servers:
+  - url: http://127.0.0.1:8080
+paths:
+  /auth/google:
+    post:
+      summary: "Register or login a user with Google JWT token"
+      description: >
+        Validates a Google JWT token sent from the frontend, retrieves user information, and 
+        registers a new user or logs in an existing user based on token data.
+      operationId: googleAuth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SignInRequest"
+      responses:
+        '200':
+          description: Login successful
+          headers:
+            Set-Cookie:
+              required: true
+              schema:
+                type: string
+                example: "Authorization: Bearer <token>"
+        "401":
+          $ref: "#/components/responses/unauthorized"
+        "500":
+          description: "Internal Server Error - Failed to process the request"
+      security: [ ]
+  /users:
+    get:
+      operationId: GetUsers
+      summary: Get Users
+      description: Retrieve a paginated list of users using limit and offset for pagination.
+      responses:
+        '200':
+          description: List of users retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - totalPages
+                properties:
+                  totalPages:
+                    type: integer
+                    description: Total number of pages available for the user list
+      security:
+        - BearerAuth: [ ]
+
+security:
+  - bearerAuth: []
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\""
+  responses:
+    unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - message
+            properties:
+              message:
+                type: string
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: "Unique identifier for the user (Primary Key)"
+          example: 1
+        email:
+          type: string
+          format: email
+          description: "Unique email address of the user"
+          example: "user@example.com"
+        name:
+          type: string
+          maxLength: 100
+          description: "Name of the user"
+          example: "John Doe"
+        image_url:
+          type: string
+          description: "URL to the user's profile image"
+          example: "https://example.com/images/user.jpg"
+        created_at:
+          type: string
+          format: date-time
+          description: "Timestamp when the user was created"
+          example: "2024-01-01T12:00:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          description: "Timestamp when the user was last updated"
+          example: "2024-01-02T12:00:00Z"
+        deleted_at:
+          type: string
+          format: date-time
+          description: "Timestamp when the user was deleted, if applicable (null if not deleted)"
+          nullable: true
+          example: null
+      required:
+        - id
+        - email
+        - name
+        - image_url
+
+    SignInRequest:
+      type: object
+      description: "Request to register or log in a user using a Google JWT token and user information."
+      required:
+        - email
+        - name
+        - imageURL
+        - token
+      properties:
+        email:
+          $ref: "#/components/schemas/User/properties/email"
+        name:
+          $ref: "#/components/schemas/User/properties/name"
+        imageURL:
+          $ref: "#/components/schemas/User/properties/image_url"
+        token:
+          type: string
+          description: "Google JWT token provided after Google authentication"
+          example: "eyJhbGciOiJSUzI1NiIsImtpZCI6IjFlODk5..."
